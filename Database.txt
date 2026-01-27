@@ -1,0 +1,157 @@
+-- ==========================================
+-- 1. USERS & AUTHENTICATION
+-- ==========================================
+
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    phone VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_addresses (
+    address_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    address_line1 VARCHAR(255) NOT NULL,
+    address_line2 VARCHAR(255),
+    city VARCHAR(100),
+    postal_code VARCHAR(20),
+    country VARCHAR(100),
+    is_default BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- ==========================================
+-- 2. PRODUCTS & INVENTORY (ADVANCED)
+-- ==========================================
+
+CREATE TABLE categories (
+    category_id INT PRIMARY KEY AUTO_INCREMENT,
+    parent_id INT NULL, -- Allows for sub-categories (e.g., Men -> Shoes)
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    FOREIGN KEY (parent_id) REFERENCES categories(category_id)
+);
+
+CREATE TABLE products (
+    product_id INT PRIMARY KEY AUTO_INCREMENT,
+    category_id INT,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    base_price DECIMAL(10, 2) NOT NULL, -- General price for display
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL
+);
+
+-- Handles Sizes, Colors, and specific Stock
+CREATE TABLE product_variants (
+    variant_id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT,
+    sku VARCHAR(100) UNIQUE NOT NULL,
+    size VARCHAR(50),
+    color VARCHAR(50),
+    price_modifier DECIMAL(10, 2) DEFAULT 0.00, -- e.g., +$2.00 for XL
+    stock_quantity INT DEFAULT 0,
+    image_url VARCHAR(255),
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
+);
+
+-- ==========================================
+-- 3. MARKETING & CART
+-- ==========================================
+
+CREATE TABLE coupons (
+    coupon_id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    discount_type ENUM('percentage', 'fixed_amount') NOT NULL,
+    discount_value DECIMAL(10, 2) NOT NULL,
+    start_date TIMESTAMP,
+    end_date TIMESTAMP,
+    usage_limit INT DEFAULT 1000,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE shopping_cart (
+    cart_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE cart_items (
+    cart_item_id INT PRIMARY KEY AUTO_INCREMENT,
+    cart_id INT,
+    variant_id INT,
+    quantity INT DEFAULT 1,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cart_id) REFERENCES shopping_cart(cart_id) ON DELETE CASCADE,
+    FOREIGN KEY (variant_id) REFERENCES product_variants(variant_id) ON DELETE CASCADE
+);
+
+-- ==========================================
+-- 4. ORDERS & TRANSACTIONS
+-- ==========================================
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    coupon_id INT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
+    shipping_address_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (coupon_id) REFERENCES coupons(coupon_id),
+    FOREIGN KEY (shipping_address_id) REFERENCES user_addresses(address_id)
+);
+
+CREATE TABLE order_items (
+    order_item_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT,
+    variant_id INT, -- Links to the specific size/color purchased
+    product_name VARCHAR(255), -- Snapshot in case product is deleted later
+    quantity INT NOT NULL,
+    price_at_purchase DECIMAL(10, 2) NOT NULL, -- CRITICAL: Stores historical price
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (variant_id) REFERENCES product_variants(variant_id)
+);
+
+CREATE TABLE payments (
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT,
+    amount DECIMAL(10, 2) NOT NULL,
+    provider ENUM('bkash', 'nagad', 'cod') NOT NULL,
+    status ENUM('pending', 'success', 'failed', 'refunded') DEFAULT 'pending',
+    transaction_id VARCHAR(255), -- External ID from Stripe/Paypal
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+
+-- ==========================================
+-- 5. SOCIAL PROOF
+-- ==========================================
+
+CREATE TABLE product_reviews (
+    review_id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT,
+    user_id INT,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
+);
+
+-- ==========================================
+-- 6. INDEXES (FOR PERFORMANCE)
+-- ==========================================
+
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_products_category ON products(category_id);
+CREATE INDEX idx_variants_sku ON product_variants(sku);
+CREATE INDEX idx_orders_user ON orders(user_id);
+CREATE INDEX idx_orders_status ON orders(status);
