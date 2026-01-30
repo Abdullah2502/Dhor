@@ -72,7 +72,7 @@ const Profile = () => {
             );
 
             if (data?.success) {
-                toast.success("Address updated successfully");
+                toast.success("Changes saved", { position: "top-right" });
                 fetchUserData(); // Refresh data to show updates
             } else {
                 toast.error(data?.message);
@@ -100,7 +100,7 @@ const Profile = () => {
             });
 
             if (res.data.success) {
-                toast.success("Password changed successfully");
+                toast.success("Changes saved", { position: "top-right" });
                 setCurrentPassword('');
                 setNewPassword('');
                 setConfirmPassword('');
@@ -118,6 +118,7 @@ const Profile = () => {
 
     return (
         <div className='min-h-screen bg-gray-50'>
+            
             <Navbar />
             <div className='max-w-6xl mx-auto mt-10 px-4 mb-10'>
                 <h1 className='text-3xl font-bold mb-8 text-gray-800'>My Profile</h1>

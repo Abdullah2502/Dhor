@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false)
   const navigate = useNavigate()
   const auth = JSON.parse(localStorage.getItem('auth'))
 
@@ -87,43 +88,69 @@ const Navbar = () => {
           <div className='md:hidden bg-[#EEEEEE] shadow-md p-4 space-y-3'>
             <Link 
               to="/" 
-              className='block hover:text-yellow-500 transition py-2'
+              className='block hover:text-yellow-500 transition py-2 text-sm  text-gray-500 font-semibold'
               onClick={() => setIsOpen(false)}
             >
               Home
             </Link>
             <Link 
               to="/shop" 
-              className='block hover:text-yellow-500 transition py-2'
+              className='block hover:text-yellow-500 transition py-2 text-sm  text-gray-500 font-semibold'
               onClick={() => setIsOpen(false)}
             >
               Shop
             </Link>
             <div className="py-2">
-                <span className="block text-gray-500 text-sm mb-2 font-semibold">Categories</span>
-                <div className="pl-4 space-y-2 border-l-2 border-gray-300">
-                    <Link to="/shop?category=men" onClick={() => setIsOpen(false)} className="block hover:text-yellow-500 transition">Men</Link>
-                    <Link to="/shop?category=women" onClick={() => setIsOpen(false)} className="block hover:text-yellow-500 transition">Women</Link>
-                    <Link to="/shop?category=accessories" onClick={() => setIsOpen(false)} className="block hover:text-yellow-500 transition">Accessories</Link>
-                </div>
+                <button 
+                    onClick={() => setIsMobileCategoriesOpen(!isMobileCategoriesOpen)}
+                    className="flex items-center justify-between w-full text-gray-500 text-sm mb-2 font-semibold focus:outline-none"
+                >
+                    Categories
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${isMobileCategoriesOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {isMobileCategoriesOpen && (
+                    <div className="pl-4 space-y-2 border-l-2 border-gray-300">
+                        <Link to="/shop?category=men" onClick={() => setIsOpen(false)} className="block  text-gray-500 hover:text-yellow-500 transition ">Men</Link>
+                        <Link to="/shop?category=women" onClick={() => setIsOpen(false)} className="block  text-gray-500 hover:text-yellow-500 transition">Women</Link>
+                        <Link to="/shop?category=accessories" onClick={() => setIsOpen(false)} className="block  text-gray-500 hover:text-yellow-500 transition">Accessories</Link>
+                    </div>
+                )}
             </div>
-            <Link 
-              to="/cart" 
-              className='block hover:text-yellow-500 transition py-2'
-              onClick={() => setIsOpen(false)}
-            >
-              Cart
-            </Link>
-            {!auth ? (
-                <Link to="/login" onClick={() => setIsOpen(false)} className='block w-full bg-yellow-400 text-black px-4 py-2 rounded-md hover:bg-yellow-500 transition text-center'>
-                  Login
+            
+            <div className="flex gap-2 pt-2 border-t border-gray-300 mt-2">
+                <Link 
+                  to="/cart" 
+                  className='flex-1 bg-white text-center py-2 rounded shadow-sm hover:bg-gray-50 transition text-sm font-medium'
+                  onClick={() => setIsOpen(false)}
+                  title="Cart"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
                 </Link>
-            ) : (
-                <>
-                    <Link to="/profile" onClick={() => setIsOpen(false)} className='block hover:text-yellow-500 transition py-2'>Profile</Link>
-                    <button onClick={() => { handleLogout(); setIsOpen(false); }} className='block w-full text-left hover:text-yellow-500 transition py-2'>Logout</button>
-                </>
-            )}
+                {!auth ? (
+                    <Link to="/login" onClick={() => setIsOpen(false)} className='flex-1 bg-yellow-400 text-black text-center py-2 rounded shadow-sm hover:bg-yellow-500 transition text-sm font-medium' title="Login">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                      </svg>
+                    </Link>
+                ) : (
+                    <>
+                        <Link to="/profile" onClick={() => setIsOpen(false)} className='flex-1 bg-white text-center py-2 rounded shadow-sm hover:bg-gray-50 transition text-sm font-medium' title="Profile">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </Link>
+                        <button onClick={() => { handleLogout(); setIsOpen(false); }} className='flex-1 bg-yellow-400 text-white text-center py-2 rounded shadow-sm hover:bg-yellow-500 transition text-sm font-medium' title="Logout">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </button>
+                    </>
+                )}
+            </div>
           </div>
         )}
     </div>
