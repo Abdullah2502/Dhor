@@ -18,6 +18,7 @@ const Register = () => {
     const [city, setCity] = useState('');
     const [postalCode, setPostalCode] = useState('');
     const [country, setCountry] = useState('');
+    const [showModal, setShowModal] = useState(false);
 
     const navigate = useNavigate();
 
@@ -42,8 +43,7 @@ const Register = () => {
             });
 
             if (res.data.success) {
-                toast.success(res.data.message);
-                navigate('/login');
+                setShowModal(true);
             } else {
                 toast.error(res.data.message);
             }
@@ -130,6 +130,23 @@ const Register = () => {
                     </p>
                 </div>
             </div>
+
+            {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full text-center">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 text-gray-800">Signup Successful!</h3>
+                        <p className="text-gray-600 mb-6">Your account has been created successfully.</p>
+                        <button onClick={() => navigate('/login')} className="w-full bg-yellow-400 text-black font-bold py-2 px-4 rounded-md hover:bg-yellow-500 transition duration-300">
+                            Continue to Login
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

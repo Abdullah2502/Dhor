@@ -3,11 +3,16 @@ import { Link, useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const navigate = useNavigate()
   const auth = JSON.parse(localStorage.getItem('auth'))
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
+  }
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen)
   }
 
   const handleLogout = () => {
@@ -41,20 +46,27 @@ const Navbar = () => {
                 </div>
             </div>
 
-            <div className='hidden md:block'>
+            <div className='hidden md:flex items-center gap-4'>
+                <Link to="/cart" className="hover:text-yellow-500 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </Link>
                 {!auth ? (
                     <Link to="/login" className='bg-yellow-400 text-black px-4 py-2 rounded-md hover:bg-yellow-500 transition'>Login</Link>
                 ) : (
-                    <div className="relative group">
-                        <button className="flex items-center gap-2 focus:outline-none">
+                    <div className="relative">
+                        <button onClick={toggleDropdown} className="flex items-center gap-2 focus:outline-none">
                             <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-black font-bold text-lg">
-                                {auth?.user?.lastName ? auth.user.lastName[0].toUpperCase() : 'U'}
+                                {auth?.user?.lastName ? auth.user.lastName[0].toUpperCase() : (auth?.user?.firstName ? auth.user.firstName[0].toUpperCase() : 'U')}
                             </div>
                         </button>
-                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                            <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600">Profile</Link>
-                            <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600">Logout</button>
-                        </div>
+                        {isDropdownOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50">
+                                <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600" onClick={() => setIsDropdownOpen(false)}>Profile</Link>
+                                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600">Logout</button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -95,6 +107,13 @@ const Navbar = () => {
                     <Link to="/shop?category=accessories" onClick={() => setIsOpen(false)} className="block hover:text-yellow-500 transition">Accessories</Link>
                 </div>
             </div>
+            <Link 
+              to="/cart" 
+              className='block hover:text-yellow-500 transition py-2'
+              onClick={() => setIsOpen(false)}
+            >
+              Cart
+            </Link>
             {!auth ? (
                 <Link to="/login" onClick={() => setIsOpen(false)} className='block w-full bg-yellow-400 text-black px-4 py-2 rounded-md hover:bg-yellow-500 transition text-center'>
                   Login
