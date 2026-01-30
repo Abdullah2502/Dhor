@@ -48,7 +48,7 @@ const Navbar = () => {
                     <div className="relative group">
                         <button className="flex items-center gap-2 focus:outline-none">
                             <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-black font-bold text-lg">
-                                {auth?.user?.firstName ? auth.user.firstName[0].toUpperCase() : 'U'}
+                                {auth?.user?.lastName ? auth.user.lastName[0].toUpperCase() : 'U'}
                             </div>
                         </button>
                         <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
