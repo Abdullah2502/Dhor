@@ -10,7 +10,10 @@ const port = process.env.PORT || 4000;
 
 
 app.use(cors({
-  origin: 'http://localhost:5173', // or whatever your frontend URL is
+  origin: [
+        "http://localhost:5173",           // Keep this for local development
+        "https://dhor.netlify.app"         // Add your live Netlify URL here
+    ],// or whatever your frontend URL is
   credentials: true
 }));
 getConnection();
