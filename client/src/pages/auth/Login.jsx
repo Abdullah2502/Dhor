@@ -10,31 +10,41 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        // FIXED: URL is now exactly "/api/auth/login" as you requested
-        const res = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/auth/login`, 
-            { email, password }
-        );
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+            email,
+            password
+        });
 
-        if (res.data.success) {
+        // DEBUGGING: Open your browser console (F12) to see this!
+        console.log("Full Login Response:", res.data);
+        console.log("User Role:", res.data.user?.role);
+        console.log("Role Type:", typeof res.data.user?.role);
+
+        if (res && res.data.success) {
             toast.success(res.data.message);
             
-            // 1. Save Token to Local Storage
             localStorage.setItem('auth', JSON.stringify(res.data));
-
-            // 2. Navigate to Home
-            navigate('/'); 
+            
+            // --- FIXED REDIRECT LOGIC ---
+            // usage of == instead of === allows "1" to equal 1
+            if (res.data.user.role == 1) { 
+                navigate('/dashboard/admin');
+            } else {
+                navigate('/');
+            }
+            // ----------------------
+            
         } else {
             toast.error(res.data.message);
         }
     } catch (error) {
         console.log(error);
-        toast.error('Something went wrong');
+        toast.error("Something went wrong");
     }
-  }
+}
 
   return (
     <div className='min-h-screen bg-gray-50'>
