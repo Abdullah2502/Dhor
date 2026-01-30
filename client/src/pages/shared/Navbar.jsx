@@ -1,11 +1,18 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const navigate = useNavigate()
+  const auth = JSON.parse(localStorage.getItem('auth'))
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth')
+    navigate('/login')
   }
 
   return (
@@ -35,7 +42,21 @@ const Navbar = () => {
             </div>
 
             <div className='hidden md:block'>
-                <Link to="/login" className='bg-yellow-400 text-black px-4 py-2 rounded-md hover:bg-yellow-500 transition'>Login</Link>
+                {!auth ? (
+                    <Link to="/login" className='bg-yellow-400 text-black px-4 py-2 rounded-md hover:bg-yellow-500 transition'>Login</Link>
+                ) : (
+                    <div className="relative group">
+                        <button className="flex items-center gap-2 focus:outline-none">
+                            <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-black font-bold text-lg">
+                                {auth?.user?.firstName ? auth.user.firstName[0].toUpperCase() : 'U'}
+                            </div>
+                        </button>
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                            <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600">Profile</Link>
+                            <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600">Logout</button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -74,9 +95,16 @@ const Navbar = () => {
                     <Link to="/shop?category=accessories" onClick={() => setIsOpen(false)} className="block hover:text-yellow-500 transition">Accessories</Link>
                 </div>
             </div>
-            <Link to="/login" onClick={() => setIsOpen(false)} className='block w-full bg-yellow-400 text-black px-4 py-2 rounded-md hover:bg-yellow-500 transition text-center'>
-              Login
-            </Link>
+            {!auth ? (
+                <Link to="/login" onClick={() => setIsOpen(false)} className='block w-full bg-yellow-400 text-black px-4 py-2 rounded-md hover:bg-yellow-500 transition text-center'>
+                  Login
+                </Link>
+            ) : (
+                <>
+                    <Link to="/profile" onClick={() => setIsOpen(false)} className='block hover:text-yellow-500 transition py-2'>Profile</Link>
+                    <button onClick={() => { handleLogout(); setIsOpen(false); }} className='block w-full text-left hover:text-yellow-500 transition py-2'>Logout</button>
+                </>
+            )}
           </div>
         )}
     </div>
