@@ -27,6 +27,8 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/auth', authRoutes);
+
+app.use("/api/product", productRoutes);
 app.get("/", (req,res)=>{
     res.send("Server is running");
 });

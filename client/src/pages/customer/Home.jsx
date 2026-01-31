@@ -18,7 +18,7 @@ const Home = () => {
       <section className='relative bg-gray-900 text-white h-[85vh] flex items-center justify-center overflow-hidden'>
         <div 
             className='absolute inset-0 bg-cover bg-center opacity-60' 
-            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80')" }}
+            style={{ backgroundImage: "url('/HERO.png')" }}
         ></div>
         <div className='relative z-10 text-center px-4 animate-fade-in-up'>
             <h1 className='text-5xl md:text-7xl font-bold mb-6 tracking-tight drop-shadow-lg'>Redefine Your Style</h1>
